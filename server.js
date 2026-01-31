@@ -14,26 +14,61 @@ const CANDY_MACHINE_ID = new PublicKey(
 const WHITELIST_FILE = "./whitelist.json";
 const MINTED_FILE = "./minted.json";
 
+/* ─────────────────────────────
+   LOAD WHITELIST (ARRAY)
+───────────────────────────── */
 const whitelist = JSON.parse(fs.readFileSync(WHITELIST_FILE, "utf8"));
 
-if (!fs.existsSync(MINTED_FILE)) {
-  fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
+/* ─────────────────────────────
+   ENSURE MINTED FILE IS ARRAY
+───────────────────────────── */
+function ensureMintedFile() {
+  if (!fs.existsSync(MINTED_FILE)) {
+    fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
+    return;
+  }
+
+  try {
+    const data = JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
+    if (!Array.isArray(data)) {
+      fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
+    }
+  } catch {
+    fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
+  }
 }
 
-const getMinted = () =>
-  JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
+ensureMintedFile();
 
-const markMinted = (wallet) => {
+/* ─────────────────────────────
+   SAFE HELPERS
+───────────────────────────── */
+function getMinted() {
+  try {
+    const data = JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function markMinted(wallet) {
   const minted = getMinted();
   if (!minted.includes(wallet)) {
     minted.push(wallet);
     fs.writeFileSync(MINTED_FILE, JSON.stringify(minted, null, 2));
   }
-};
+}
 
+/* ─────────────────────────────
+   EXPRESS + CORS
+───────────────────────────── */
 app.use(cors({ origin: "*", methods: ["POST", "OPTIONS"] }));
 app.use(express.json());
 
+/* ─────────────────────────────
+   DRY-RUN CHECK (NO MINT)
+───────────────────────────── */
 app.post("/mint/check", async (req, res) => {
   try {
     const { wallet } = req.body;
@@ -48,21 +83,23 @@ app.post("/mint/check", async (req, res) => {
     }
 
     const connection = new Connection(RPC_URL);
-    const candyMachineAccount = await connection.getAccountInfo(
-      CANDY_MACHINE_ID
-    );
+    const cmAccount = await connection.getAccountInfo(CANDY_MACHINE_ID);
 
-    if (!candyMachineAccount) {
+    if (!cmAccount) {
       return res.json({ eligible: false, reason: "CM_NOT_FOUND" });
     }
 
     return res.json({ eligible: true });
+
   } catch (err) {
-    console.error(err);
+    console.error("CHECK ERROR:", err);
     return res.json({ eligible: false, reason: "INTERNAL_ERROR" });
   }
 });
 
+/* ─────────────────────────────
+   RECORD MINT (CALLED AFTER SUCCESS)
+───────────────────────────── */
 app.post("/mint/record", (req, res) => {
   const { wallet } = req.body;
   if (!wallet) return res.status(400).json({ error: "Wallet required" });
@@ -71,6 +108,9 @@ app.post("/mint/record", (req, res) => {
   return res.json({ ok: true });
 });
 
+/* ─────────────────────────────
+   START SERVER
+───────────────────────────── */
 app.listen(PORT, () => {
-  console.log(`✅ Backend running on port ${PORT}`);
+  console.log(`✅ Fundoshi backend running on port ${PORT}`);
 });
