@@ -1,0 +1,210 @@
+{
+  "program": {
+    "candyMachine": "",
+    "candyGuard": "",
+    "candyMachineCreator": "",
+    "collectionMint": ""
+  },
+  "items": {
+    "0": {
+      "name": "FUNDOSHI #1",
+      "image_hash": "f122a3de175bad9e1cc77472701c2189438952cd2c2faf567940c5473c453a36",
+      "image_link": "https://gateway.irys.xyz/O5j9UG7oUOlpuTbxgpMMwOivVFvNtz_2lnAxadcSJ_c?ext=png",
+      "metadata_hash": "3eb9a84bc10ab9c414eeee27985ce8cf6878cd94e641410d56449937e2de2fe8",
+      "metadata_link": "https://gateway.irys.xyz/JWrktlTNZmaOA3KsJR6wJRF4_hAWX-QoSSK5KCETt4Y",
+      "onChain": false
+    },
+    "1": {
+      "name": "FUNDOSHI #2",
+      "image_hash": "a27964eb22a0be61ad09fc2ea9f66b4499baaf99c0d89b64a28d87c28261dde7",
+      "image_link": "https://gateway.irys.xyz/VfB9HVkA6xGyAowV-VGS3SMW9f2tptMhLZzcY0JKKPk?ext=png",
+      "metadata_hash": "50797e8d938a41fc99c4fa2dfad2a5edbeb0634ef98fe7e190494ae65d3c0f0d",
+      "metadata_link": "https://gateway.irys.xyz/4070uX9MaQSJ4kbd5EO3WphKUD2AQa1HENNdsV9OQG0",
+      "onChain": false
+    },
+    "2": {
+      "name": "FUNDOSHI #3",
+      "image_hash": "bff5ece136e566cab4cebe89d231724746f7e704e2b0c417ac3e21558bab0cef",
+      "image_link": "https://gateway.irys.xyz/eOSh-OGURidMdESSryjhxrdYf-vqZBK8nwl7B8KzdNg?ext=png",
+      "metadata_hash": "859fcbe09f9a10a3e84e105c5b3fe4a28bb98adea1bc70339f89e2a4202c8752",
+      "metadata_link": "https://gateway.irys.xyz/6mJ_DTXwvPTS2n5B8f77vOw_Zed48Uv0Jnr7WSOd2Sg",
+      "onChain": false
+    },
+    "3": {
+      "name": "FUNDOSHI #4",
+      "image_hash": "068243e4744722b22ff4db1467a4288be93da404bf7a97ac88d534da796ff5e2",
+      "image_link": "https://gateway.irys.xyz/wafqONS1bxYPJmqbDZon7-0i5BAOVR_1BCy7yznzOu8?ext=png",
+      "metadata_hash": "62af9f017d559b90dfc8fb6ba323116c2819af8577dbfd540695578317c5022a",
+      "metadata_link": "https://gateway.irys.xyz/Jott3E7aJJ1GVcgI9jscJc4uXOlB_89P5pyQ0HvWNlY",
+      "onChain": false
+    },
+    "4": {
+      "name": "FUNDOSHI #5",
+      "image_hash": "e3c59563c351e0256c37c8257469468399b327e836b30ee901fb32d5c4fc4d53",
+      "image_link": "https://gateway.irys.xyz/T19UPfccj8ZPPBrWGZfeb92X6If7BVwOhcsxXZLVj-Y?ext=png",
+      "metadata_hash": "413b8934805133ba0e8c8c2107f44032e24c2f8e8c913c8e68c3d9e68bf01306",
+      "metadata_link": "https://gateway.irys.xyz/NTUnlkb4XBfd4nTYSIByWpFf1U9E-aD6JWK11pYNsOw",
+      "onChain": false
+    },
+    "5": {
+      "name": "FUNDOSHI #6",
+      "image_hash": "591c5f14bcda10a23df1d694df04820292eef1f2393634ccf7fff3846fb4bec5",
+      "image_link": "https://gateway.irys.xyz/cgfRKgj81_MDZSgSFY73MPn6CYKP0u8MBifERtVTcdI?ext=png",
+      "metadata_hash": "edd871d02d35953d0bb878651db763a5369f70695927ca50f20c5a73f4a65e7e",
+      "metadata_link": "https://gateway.irys.xyz/e6nFLZLo1SH9TsZ9NlYDWMJ6mNNDqIXm1HS6CkCJgZM",
+      "onChain": false
+    },
+    "6": {
+      "name": "FUNDOSHI #7",
+      "image_hash": "56f7a7b309df4a64a6bdca47d8a309b1bf2fad9944844312a6ea342698e5ca8f",
+      "image_link": "https://gateway.irys.xyz/f-wFj2xsJzq6FKA8kj2vu5QwQzafG1TV1-GusM6Y9D4?ext=png",
+      "metadata_hash": "117729c10d554896632dce20a26bb5d0ba978e8a0fc320c785f9aa1e7f696fd9",
+      "metadata_link": "https://gateway.irys.xyz/rHPSqthvHMu4QxJes8Oqpn4R-AuHArAnI_A9UxF0Q50",
+      "onChain": false
+    },
+    "7": {
+      "name": "FUNDOSHI #8",
+      "image_hash": "50d7582a3f108c2bd96229c88c422e4770a25c1b40c3ca0b49001767503b489b",
+      "image_link": "https://gateway.irys.xyz/bY_LNX5tGVqQH9ADmAuBlTSPhGtGVR_Si554RipuUuc?ext=png",
+      "metadata_hash": "db5798dfb3b4e488b8654d408643c31034e9dde07be67a4ea5fffaab030f8443",
+      "metadata_link": "https://gateway.irys.xyz/pieu9HkQj2Yt9jqcxv8vC1MY2D_lacD0aAVbRb89v98",
+      "onChain": false
+    },
+    "8": {
+      "name": "FUNDOSHI #9",
+      "image_hash": "61446f78e543c9cf9ceba4ff03ecd23c73e8717ffe1ea94d22be8ede2489e0e6",
+      "image_link": "https://gateway.irys.xyz/npugD5vglHserfXNfePugTS1R8fO2YQTBDt8PWDlk4U?ext=png",
+      "metadata_hash": "aaec484593a897992762f7715e8f42bcb8b8d1920ee7c16e470f48b522266a35",
+      "metadata_link": "https://gateway.irys.xyz/h25NeoQrdt2l8ZHLfduhqDJDUTR8ckYdKAyrzqIdGg4",
+      "onChain": false
+    },
+    "9": {
+      "name": "FUNDOSHI #10",
+      "image_hash": "9b7ac3ec67fdb3183031d646bce4938d6c1d10585fabf03389294c249cc677f1",
+      "image_link": "https://gateway.irys.xyz/EFZpbF_vgdvLiGLbkw7-6fK3d2EVSa_zxObxxsbXA6s?ext=png",
+      "metadata_hash": "a4c5ae83a90de4e4636f99321d5c02629ac07890aad6f0f116248693baaa2114",
+      "metadata_link": "https://gateway.irys.xyz/SZNAijPMxuU3P77EGm7FJsFxQPHHkA1VKqF73gynPys",
+      "onChain": false
+    },
+    "10": {
+      "name": "FUNDOSHI #11",
+      "image_hash": "a2cdd4e5da3c1321af60ad02c174d9ce1fab9ccbd7b55e188666830d87eea229",
+      "image_link": "https://gateway.irys.xyz/Jc4hveQDPXgT5rywGwVI0QoW4rqNpv0w-y0ppsbvhsA?ext=png",
+      "metadata_hash": "76dd002f58b25d45fd48096520128723df27b01367937a02384f0fdb7707cde5",
+      "metadata_link": "https://gateway.irys.xyz/Kj1lSX1-KzmNyfu_QbTflcGW7rAUzZU3tj30Dne0qoQ",
+      "onChain": false
+    },
+    "11": {
+      "name": "FUNDOSHI #12",
+      "image_hash": "7dd6ee87b9f6337daa593ddb68401eb5b3d1307f7127fcee061f4b9c39f31df9",
+      "image_link": "https://gateway.irys.xyz/vgxllo6ewWWzOxt2NBCw--C6bpxivOV5isXw9v6lp2s?ext=png",
+      "metadata_hash": "54c9df12216a3ce7996452c35e8e1ef14fe9aeea6f0909e3e360613540e1f0e6",
+      "metadata_link": "https://gateway.irys.xyz/R7S5u0GUoFCa8xst0HDLpvwn67x8JyyNbCBj7oBLDG4",
+      "onChain": false
+    },
+    "12": {
+      "name": "FUNDOSHI #13",
+      "image_hash": "ca6e6ddfbcf9c7505e5e2c8d6d5e42baa7701724ba0b26630ffd1ef0c50c95f5",
+      "image_link": "https://gateway.irys.xyz/FjvHypBJU8qIOHDypzY7rSgUSFUQlH_nytPD8GzxmWY?ext=png",
+      "metadata_hash": "59558f05514282ab36f52ab9beb1f606204500c8e8229e981ce98a2c42540bdd",
+      "metadata_link": "https://gateway.irys.xyz/Sw2nRygNAN8htzwPjRBBWQp15mJJZztS6c-eI6JCxLE",
+      "onChain": false
+    },
+    "13": {
+      "name": "FUNDOSHI #14",
+      "image_hash": "acd2997f4e178645409ec5a087ba1ec70dc14175c200fb814a14da67229c0cbe",
+      "image_link": "https://gateway.irys.xyz/g3gHkZv6iYI4LFbxwE1MpRPOMtyOlEz_2GF0PmjyW7E?ext=png",
+      "metadata_hash": "03afd38aa53c1460f372bfa9190662db5dcf35db8162f262ab742a4b152f6cfb",
+      "metadata_link": "https://gateway.irys.xyz/KA1v9oo_4_GiG1MKgbMm7GpTClafb90KM0kTixD0QRM",
+      "onChain": false
+    },
+    "14": {
+      "name": "FUNDOSHI #15",
+      "image_hash": "9d65e50de395f977909d3169c92f4dbd46b391c26d9eeadeaf82fabfdd487979",
+      "image_link": "https://gateway.irys.xyz/JUEK1DeOvJsQHNBIFeM6o81m7ql4Ltpwf3jpU1L0r7M?ext=png",
+      "metadata_hash": "c0ba91345cc5689d754bddd1c89bee22ea6997dcf0207ba0fa4855e0330a454e",
+      "metadata_link": "https://gateway.irys.xyz/B_s926c7hDwN-ENoZigwtWSda2uVlLmE7tZWXIcbS8U",
+      "onChain": false
+    },
+    "15": {
+      "name": "FUNDOSHI #16",
+      "image_hash": "09915f4deacfb21c9f582f954947120976ffaad1a72f71c53acf64501ee57442",
+      "image_link": "https://gateway.irys.xyz/X_r_OaRFJ0DnCFELNcA7mRTSxodpem49_1_8h1YKnv0?ext=png",
+      "metadata_hash": "f097e0e0c8744875101a2c7acd9ef902759a4b65e0b95566291699e6d435570c",
+      "metadata_link": "https://gateway.irys.xyz/1kjmhO33MS4qJISCDgfu59HKqXo2gO3UYJKTWNcKJoY",
+      "onChain": false
+    },
+    "16": {
+      "name": "FUNDOSHI #17",
+      "image_hash": "a2cab0c173892e813dbd9b7b64a1d2eba11b586fe2b859bd1a8bc1203c7931c6",
+      "image_link": "https://gateway.irys.xyz/VjJsQmJds_UebmKAzzgoOtAqKXlsyXBG7XCIHr_kpsg?ext=png",
+      "metadata_hash": "d2709eff3f4c59b5c056c64a37a5dc675dcc72d281ab75b734c1eb25fb5a25a3",
+      "metadata_link": "https://gateway.irys.xyz/B5Q4CvJ7aUpyPN0wrQe0CqWqEkag4_WzROSI2zUKC-I",
+      "onChain": false
+    },
+    "17": {
+      "name": "FUNDOSHI #18",
+      "image_hash": "aed6c54085d9216d8bbe1971bfbb0624707bfb916d2ee9fa1e9366ac2528bea8",
+      "image_link": "https://gateway.irys.xyz/pS9fkfgeo8Mm8h3r1o2DnN5WSyAfkxQzxoOVEgGq3-A?ext=png",
+      "metadata_hash": "bf47759429497482fedfa8bd5b6105af968adf3b1b694498e952877affd41d31",
+      "metadata_link": "https://gateway.irys.xyz/gKTnchiq9znX3wsdYZIqQsAC5y_icuyRTOSJJvb_xqA",
+      "onChain": false
+    },
+    "18": {
+      "name": "FUNDOSHI #19",
+      "image_hash": "587c6448c16cd4004610df14440656e2ef64b2e8441620a39bbe3eeb4b0d5953",
+      "image_link": "https://gateway.irys.xyz/5Dg79m26aN0pg5uEB7RgBqlyTNEdr1PHCXp5mXkOnMc?ext=png",
+      "metadata_hash": "3036ef4456795ca8de6ba2205e40a1e7a1699e4dd4da55ee67e99703bbf75217",
+      "metadata_link": "https://gateway.irys.xyz/4li5Brd9Oy_HlIPogelJkmv7ywfJfnqZ-pe9UvYi9Yk",
+      "onChain": false
+    },
+    "19": {
+      "name": "FUNDOSHI #20",
+      "image_hash": "a1160bb61bbf4eff9a3aab8735dac5480872962604e4f21dc16228f038d80f0f",
+      "image_link": "https://gateway.irys.xyz/Goljj1h-iikJ52YoB5bLk68U4UBlJ0n3mh111FHXGSY?ext=png",
+      "metadata_hash": "1fd8f453bc56d8638cc3d55a513dda00e279fcc229f8330802ba59151316b71e",
+      "metadata_link": "https://gateway.irys.xyz/EZNyhFagpo4R9Fp4qL0YvEqsWGBkKXBoPuOxIiDMuGQ",
+      "onChain": false
+    },
+    "20": {
+      "name": "FUNDOSHI #21",
+      "image_hash": "60a6e6b10b5f3b39a462bab310180500162adde86057b7c51e45184c88ab4fbc",
+      "image_link": "https://gateway.irys.xyz/z0adGamj5R2qevVZgT4mNZO-sYwEcjVyTEkv9rKuKVY?ext=png",
+      "metadata_hash": "0184b67776b4aafc50be3c4cfc6198d382d85ff20239960c23ad8bf4d4cdf9b1",
+      "metadata_link": "https://gateway.irys.xyz/oROVMrbYYN9NTAah__beJjf6nzGyEjNnfh_7-ZkLj1c",
+      "onChain": false
+    },
+    "21": {
+      "name": "FUNDOSHI #22",
+      "image_hash": "fd2885e23295493f5d1ae5befd5ddef88b08a1aa5c16988eb1f2f91dbcaa4de0",
+      "image_link": "https://gateway.irys.xyz/NvcePxfI7tl3HZrB03cO2zOBZrFiFxz2-rKZLp93BZI?ext=png",
+      "metadata_hash": "7f3348dddc4233f11669f32be3b772208f59050a1fde3fc2b4b4726f86827483",
+      "metadata_link": "https://gateway.irys.xyz/ayK7wb5NAKhqjxCP7rhNZSDKXStwj6eU0FgvVLiR95k",
+      "onChain": false
+    },
+    "22": {
+      "name": "FUNDOSHI #23",
+      "image_hash": "2ede18e0c4a5a3aa9980950f1e9f395d04f9a4492a8917b4de2996a2310f26a7",
+      "image_link": "https://gateway.irys.xyz/L_0_PgOvmdqE6xJnKKa7p5OqSXvyUrHJc1Y93U6uPdQ?ext=png",
+      "metadata_hash": "f30f69acda13aba468f1cf6c7c989495e2e95014f4c431ecfe26d601c3d4a044",
+      "metadata_link": "https://gateway.irys.xyz/1z3rGofHu4lJ0hs1rx0oQ043zNIVyk8zJRETxK3wIqc",
+      "onChain": false
+    },
+    "23": {
+      "name": "FUNDOSHI #24",
+      "image_hash": "0fa981e6616fdd5cbdab02d9d44badb3b1018f0774dc95cfd11b6f9b9f0c224c",
+      "image_link": "https://gateway.irys.xyz/fF-NuxVYl0FOUvH22NnkbnthDF8KXSfXq9m5zEA7RDM?ext=png",
+      "metadata_hash": "769ff620a0d445e5bef42760e2e6393cfb35f3d617c7124427173dc08732cf1c",
+      "metadata_link": "https://gateway.irys.xyz/rYqIioyAYYUCCoBWriG3ZdOqzjWT7EVOUnavdV2OesM",
+      "onChain": false
+    },
+    "24": {
+      "name": "FUNDOSHI #25",
+      "image_hash": "bcd2fe0a4ac674125b783394bd6637a5180bdb42ab42e85ccf495cd5436bf513",
+      "image_link": "https://gateway.irys.xyz/kcG0sN25Rq2_Sf9Zbt6DcAByM8DDIXGpJGYdmEe29b8?ext=png",
+      "metadata_hash": "aa97967dd6eb8a8d3af446d1749240c6af02138a3f84be466eafdd9591862fb5",
+      "metadata_link": "https://gateway.irys.xyz/zSzeDFI--tONTxw9WVrxcrL-4kEuE_iT2MlBlwBFbBQ",
+      "onChain": false
+    }
+  }
+}

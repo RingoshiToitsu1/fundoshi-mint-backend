@@ -1,0 +1,23 @@
+{
+  "name": "FUNDOSHI #18",
+  "symbol": "FUNDOSHI",
+  "description": "",
+  "image": "https://gateway.pinata.cloud/ipfs/QmWU1ZBf12Yk52QowPdsXLhj4vgGdkYArKGoef46geFpM5",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://gateway.pinata.cloud/ipfs/QmWU1ZBf12Yk52QowPdsXLhj4vgGdkYArKGoef46geFpM5",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "DNwXiq3n7ZsQFBqYcx7Lxtikzn7ySzENBZxKM8C2Q6Sf",
+        "share": 100
+      }
+    ]
+  },
+  "seller_fee_basis_points": 0
+}
