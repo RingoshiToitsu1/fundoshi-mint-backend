@@ -76,25 +76,18 @@ const metaplex = Metaplex.make(connection)
   .use(keypairIdentity(authority));
 
 // ─────────────────────────────────────────────
-// EXPRESS + CORS (THIS FIXES LOVABLE)
+// EXPRESS + CORS (FIXED FOR LOVABLE)
 // ─────────────────────────────────────────────
 
 const app = express();
 
 app.use(cors({
-  origin: [
-    /\.lovableproject\.com$/,
-    /\.lovable\.app$/,
-    "*"
-  ],
+  origin: true,
   methods: ["POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Accept"]
 }));
 
 app.use(express.json());
-
-// Explicit preflight handler (important)
-app.options("*", cors());
 
 // ─────────────────────────────────────────────
 // DRY-RUN CHECK (NO MINT)
