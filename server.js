@@ -18,7 +18,7 @@ import {
    CONFIG
 ───────────────────────────────────────────── */
 
-const RPC_URL = "https://solana-mainnet.gateway.tatum.io";
+const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=0267bb20-16b0-42e9-a5f0-c0c0f0858502";
 const PORT = process.env.PORT || 3000;
 
 const CANDY_MACHINE_ID = new PublicKey(
