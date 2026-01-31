@@ -1,3 +1,9 @@
-authority.json
 node_modules
+assets
+pinata-metadata
+pinata-images
+cache.json
+*.log
+*.bak
+authority.json
 .env

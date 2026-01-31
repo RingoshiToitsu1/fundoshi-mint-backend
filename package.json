@@ -2,14 +2,13 @@
   "name": "fundoshi-mint-backend",
   "version": "1.0.0",
   "type": "module",
-  "private": true,
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@solana/web3.js": "^1.98.4",
+    "@metaplex-foundation/js": "^0.20.1",
     "cors": "^2.8.5",
-    "@solana/web3.js": "^1.95.4",
-    "@metaplex-foundation/js": "^0.20.1"
+    "express": "^4.21.2"
   }
 }

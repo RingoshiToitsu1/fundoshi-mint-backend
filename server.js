@@ -1,30 +1,23 @@
-// ─────────────────────────────────────────────
-// IMPORTS
-// ─────────────────────────────────────────────
 import express from "express";
 import fs from "fs";
 import cors from "cors";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { Metaplex } from "@metaplex-foundation/js";
 
-import {
-  Connection,
-  Keypair,
-  PublicKey
-} from "@solana/web3.js";
+/* ───────── CONFIG ───────── */
 
-import {
-  Metaplex,
-  keypairIdentity
-} from "@metaplex-foundation/js";
+const PORT = process.env.PORT || 3000;
+const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=0267bb20-16b0-42e9-a5f0-c0c0f0858502";
 
-// ─────────────────────────────────────────────
-// FILE PATHS
-// ─────────────────────────────────────────────
+const CANDY_MACHINE_ID = new PublicKey(
+  "3pzu8qm6Hw65VH1khEtoU3ZPi8AtGn92oyjuUvVswArJ"
+);
+
 const WHITELIST_FILE = "./whitelist.json";
 const MINTED_FILE = "./minted.json";
 
-// ─────────────────────────────────────────────
-// SAFE FILE INITIALIZATION
-// ─────────────────────────────────────────────
+/* ───────── FILE SAFETY ───────── */
+
 if (!fs.existsSync(WHITELIST_FILE)) {
   fs.writeFileSync(WHITELIST_FILE, "");
 }
@@ -33,23 +26,17 @@ if (!fs.existsSync(MINTED_FILE)) {
   fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
 }
 
-// ─────────────────────────────────────────────
-// HELPER FUNCTIONS  ✅ (THIS FIXES ALL .includes ERRORS)
-// ─────────────────────────────────────────────
+/* ───────── HELPERS ───────── */
+
 const readWhitelist = () =>
-  fs.readFileSync(WHITELIST_FILE, "utf8")
+  fs
+    .readFileSync(WHITELIST_FILE, "utf8")
     .split("\n")
     .map(w => w.trim())
     .filter(Boolean);
 
-const readMinted = () => {
-  try {
-    const data = JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-};
+const readMinted = () =>
+  JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
 
 const markMinted = (wallet) => {
   const minted = readMinted();
@@ -59,55 +46,26 @@ const markMinted = (wallet) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────
-const RPC_URL = "https://solana-mainnet.gateway.tatum.io";
-const PORT = process.env.PORT || 3000;
+/* ───────── SOLANA ───────── */
 
-const CANDY_MACHINE_ID = new PublicKey(
-  "3pzu8qm6Hw65VH1khEtoU3ZPi8AtGn92oyjuUvVswArJ"
-);
-
-// ─────────────────────────────────────────────
-// AUTHORITY KEYPAIR (FROM ENV — RAILWAY SAFE)
-// ─────────────────────────────────────────────
-if (!process.env.AUTHORITY_SECRET_KEY) {
-  throw new Error("❌ AUTHORITY_SECRET_KEY env var missing");
-}
-
-const authority = Keypair.fromSecretKey(
-  Uint8Array.from(JSON.parse(process.env.AUTHORITY_SECRET_KEY))
-);
-
-// ─────────────────────────────────────────────
-// SOLANA + METAPLEX
-// ─────────────────────────────────────────────
 const connection = new Connection(RPC_URL, "confirmed");
+const metaplex = Metaplex.make(connection);
 
-const metaplex = Metaplex.make(connection)
-  .use(keypairIdentity(authority));
+/* ───────── EXPRESS ───────── */
 
-// ─────────────────────────────────────────────
-// EXPRESS SERVER + CORS
-// ─────────────────────────────────────────────
 const app = express();
 
-app.use(cors({
-  origin: "*",
-  methods: ["POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Accept"]
-}));
-
+app.use(cors({ origin: "*", methods: ["POST", "OPTIONS"] }));
 app.use(express.json());
 
-// ─────────────────────────────────────────────
-// DRY-RUN CHECK (NO MINT)
-// ─────────────────────────────────────────────
+/* ───────── DRY-RUN CHECK ───────── */
+
 app.post("/mint/check", async (req, res) => {
   try {
     const { wallet } = req.body;
-    if (!wallet) return res.json({ eligible: false, reason: "NO_WALLET" });
+    if (!wallet) {
+      return res.json({ eligible: false, reason: "NO_WALLET" });
+    }
 
     const whitelist = readWhitelist();
     if (!whitelist.includes(wallet)) {
@@ -133,71 +91,32 @@ app.post("/mint/check", async (req, res) => {
 
     return res.json({
       eligible: true,
-      reason: "OK",
       remaining
     });
 
   } catch (err) {
-    console.error("CHECK ERROR:", err);
-    return res.json({ eligible: false, reason: "INTERNAL_ERROR" });
-  }
-});
-
-// ─────────────────────────────────────────────
-// LIVE MINT (RETURNS TX — FRONTEND SIGNS)
-// ─────────────────────────────────────────────
-app.post("/mint", async (req, res) => {
-  try {
-    const { wallet } = req.body;
-    if (!wallet) return res.status(400).json({ error: "Wallet required" });
-
-    const whitelist = readWhitelist();
-    if (!whitelist.includes(wallet)) {
-      return res.status(403).json({ error: "Not whitelisted" });
-    }
-
-    const minted = readMinted();
-    if (minted.includes(wallet)) {
-      return res.status(403).json({ error: "Already minted" });
-    }
-
-    const user = new PublicKey(wallet);
-
-    const candyMachine = await metaplex
-      .candyMachines()
-      .findByAddress({ address: CANDY_MACHINE_ID });
-
-    const mintBuilder = metaplex
-      .candyMachines()
-      .builders()
-      .mint({
-        candyMachine,
-        payer: user
-      });
-
-    const transaction = await mintBuilder.build(connection);
-
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = user;
-
-    transaction.partialSign(authority);
-
-    markMinted(wallet);
-
+    console.error(err);
     return res.json({
-      tx: transaction.serialize({ requireAllSignatures: false }).toString("base64")
+      eligible: false,
+      reason: "INTERNAL_ERROR"
     });
-
-  } catch (err) {
-    console.error("MINT ERROR:", err);
-    return res.status(500).json({ error: err.message || "Mint failed" });
   }
 });
 
-// ─────────────────────────────────────────────
-// START SERVER
-// ─────────────────────────────────────────────
+/* ───────── CONFIRM MINT (called AFTER frontend mint success) ───────── */
+
+app.post("/mint/confirm", (req, res) => {
+  const { wallet } = req.body;
+  if (!wallet) {
+    return res.status(400).json({ error: "Wallet required" });
+  }
+
+  markMinted(wallet);
+  return res.json({ ok: true });
+});
+
+/* ───────── START ───────── */
+
 app.listen(PORT, () => {
   console.log(`🚀 Fundoshi backend running on port ${PORT}`);
 });
