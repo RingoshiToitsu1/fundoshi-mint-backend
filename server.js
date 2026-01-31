@@ -1,65 +1,78 @@
 import express from "express";
 import fs from "fs";
-import bodyParser from "body-parser";
-import { Connection, PublicKey, Keypair } from "@solana/web3.js";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction
+} from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 
-// ─────────────────────────────────────────────
-// ENV (Railway-safe)
-// ─────────────────────────────────────────────
+/* ================= CONFIG ================= */
 
-const PORT = process.env.PORT || 3000;
-const RPC_URL = process.env.RPC_URL;
-const LIVE_MINT = process.env.LIVE_MINT === "TRUE";
-
-// ─────────────────────────────────────────────
-// SOLANA
-// ─────────────────────────────────────────────
-
-const connection = new Connection(RPC_URL, "confirmed");
-
-const authority = Keypair.fromSecretKey(
-  Uint8Array.from(JSON.parse(process.env.AUTHORITY_KEYPAIR))
-);
-
-const metaplex = Metaplex.make(connection).use(
-  keypairIdentity(authority)
-);
+const PORT = Number(process.env.PORT || 3000);
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const LIVE_MINT = true; // 🔓 ENABLED
 
 const CANDY_MACHINE_ID = new PublicKey(
   "3pzu8qm6Hw65VH1khEtoU3ZPi8AtGn92oyjuUvVswArJ"
 );
 
-// ─────────────────────────────────────────────
-// DATA FILES
-// ─────────────────────────────────────────────
+const FUND_MINT = new PublicKey(
+  "JjGQAsJBRQLYmBj41bgZggVLawaa4qoSF77NJsRpump"
+);
+
+const REQUIRED_FUND = 10_000_000;
+
+/* ================= AUTHORITY ================= */
+
+const AUTHORITY_KEYPAIR = Keypair.fromSecretKey(
+  Uint8Array.from(JSON.parse(process.env.AUTHORITY_KEYPAIR))
+);
+
+/* ================= DATA FILES ================= */
 
 const whitelist = JSON.parse(
   fs.readFileSync("./whitelist.json", "utf8")
 );
 
-const mintedPath = "./minted.json";
-const minted = fs.existsSync(mintedPath)
-  ? JSON.parse(fs.readFileSync(mintedPath, "utf8"))
+let minted = fs.existsSync("./minted.json")
+  ? JSON.parse(fs.readFileSync("./minted.json", "utf8"))
   : [];
 
-// ─────────────────────────────────────────────
-// SERVER
-// ─────────────────────────────────────────────
+/* ================= SOLANA ================= */
+
+const connection = new Connection(RPC_URL, "confirmed");
+
+const metaplex = Metaplex.make(connection)
+  .use(keypairIdentity(AUTHORITY_KEYPAIR));
+
+/* ================= EXPRESS ================= */
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
-// ─────────────────────────────────────────────
-// DRY-RUN CHECK
-// ─────────────────────────────────────────────
+/* ================= HELPERS ================= */
+
+async function getFundBalance(wallet) {
+  const accounts = await connection.getParsedTokenAccountsByOwner(
+    wallet,
+    { mint: FUND_MINT }
+  );
+
+  if (!accounts.value.length) return 0;
+
+  return Number(
+    accounts.value[0].account.data.parsed.info.tokenAmount.amount
+  );
+}
+
+/* ================= DRY CHECK ================= */
 
 app.post("/mint/check", async (req, res) => {
   try {
-    const { wallet } = req.body;
-    if (!wallet) {
-      return res.status(400).json({ eligible: false });
-    }
+    const wallet = req.body.wallet;
+    if (!wallet) return res.json({ eligible: false });
 
     if (!whitelist.includes(wallet)) {
       return res.json({ eligible: false, reason: "NOT_WHITELISTED" });
@@ -69,49 +82,76 @@ app.post("/mint/check", async (req, res) => {
       return res.json({ eligible: false, reason: "ALREADY_MINTED" });
     }
 
+    const fundBalance = await getFundBalance(new PublicKey(wallet));
+    if (fundBalance < REQUIRED_FUND) {
+      return res.json({ eligible: false, reason: "INSUFFICIENT_FUND" });
+    }
+
     const candyMachine = await metaplex
       .candyMachines()
       .findByAddress({ address: CANDY_MACHINE_ID });
 
-    const remaining =
-      candyMachine.itemsAvailable.toNumber() -
-      candyMachine.itemsRedeemed.toNumber();
-
-    if (remaining <= 0) {
-      return res.json({ eligible: false, reason: "SOLD_OUT" });
-    }
-
     return res.json({
       eligible: true,
       reason: "OK",
-      remaining,
-      live: LIVE_MINT
+      remaining: candyMachine.itemsRemaining.toNumber()
     });
-
-  } catch (err) {
-    return res.status(500).json({
-      eligible: false,
-      reason: "INTERNAL_ERROR",
-      message: err.message
-    });
+  } catch (e) {
+    return res.json({ eligible: false, reason: "INTERNAL_ERROR" });
   }
 });
 
-// ─────────────────────────────────────────────
-// LIVE MINT (LOCKED)
-// ─────────────────────────────────────────────
+/* ================= LIVE MINT ================= */
 
-app.post("/mint", async (_req, res) => {
-  if (!LIVE_MINT) {
-    return res.status(403).json({ error: "MINT_DISABLED" });
+app.post("/mint", async (req, res) => {
+  try {
+    if (!LIVE_MINT) {
+      return res.status(403).json({ error: "MINT_DISABLED" });
+    }
+
+    const wallet = req.body.wallet;
+    if (!wallet) {
+      return res.status(400).json({ error: "WALLET_REQUIRED" });
+    }
+
+    if (!whitelist.includes(wallet)) {
+      return res.status(403).json({ error: "NOT_WHITELISTED" });
+    }
+
+    if (minted.includes(wallet)) {
+      return res.status(403).json({ error: "ALREADY_MINTED" });
+    }
+
+    const fundBalance = await getFundBalance(new PublicKey(wallet));
+    if (fundBalance < REQUIRED_FUND) {
+      return res.status(403).json({ error: "INSUFFICIENT_FUND" });
+    }
+
+    const candyMachine = await metaplex
+      .candyMachines()
+      .findByAddress({ address: CANDY_MACHINE_ID });
+
+    const { nft } = await metaplex.candyMachines().mint({
+      candyMachine,
+      payer: AUTHORITY_KEYPAIR,
+      owner: new PublicKey(wallet)
+    });
+
+    minted.push(wallet);
+    fs.writeFileSync("./minted.json", JSON.stringify(minted, null, 2));
+
+    res.json({
+      success: true,
+      mint: nft.address.toBase58()
+    });
+
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
-  return res.status(501).json({ error: "LIVE_MINT_NOT_ENABLED_YET" });
 });
 
-// ─────────────────────────────────────────────
-// BOOT (Railway-correct)
-// ─────────────────────────────────────────────
+/* ================= START ================= */
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Mint backend running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Fundoshi mint backend live on port ${PORT}`);
 });
