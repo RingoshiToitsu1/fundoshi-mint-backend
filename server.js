@@ -5,8 +5,7 @@ import cors from "cors";
 import {
   Connection,
   Keypair,
-  PublicKey,
-  Transaction
+  PublicKey
 } from "@solana/web3.js";
 
 import {
@@ -14,9 +13,7 @@ import {
   keypairIdentity
 } from "@metaplex-foundation/js";
 
-/* ─────────────────────────────────────────────
-   CONFIG
-───────────────────────────────────────────── */
+/* ───────────────── CONFIG ───────────────── */
 
 const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=0267bb20-16b0-42e9-a5f0-c0c0f0858502";
 const PORT = process.env.PORT || 3000;
@@ -25,102 +22,75 @@ const CANDY_MACHINE_ID = new PublicKey(
   "3pzu8qm6Hw65VH1khEtoU3ZPi8AtGn92oyjuUvVswArJ"
 );
 
-/* ─────────────────────────────────────────────
-   AUTHORITY (ENV VAR – NO FILE PATHS)
-   Railway ENV:
-   AUTHORITY_SECRET_KEY=[1,2,3,...,64]
-───────────────────────────────────────────── */
+/* ─────────────── AUTHORITY ─────────────── */
 
 if (!process.env.AUTHORITY_SECRET_KEY) {
-  console.error("❌ AUTHORITY_SECRET_KEY env var missing");
-  process.exit(1);
+  throw new Error("AUTHORITY_SECRET_KEY env var missing");
 }
 
 const authority = Keypair.fromSecretKey(
   Uint8Array.from(JSON.parse(process.env.AUTHORITY_SECRET_KEY))
 );
 
-/* ─────────────────────────────────────────────
-   FILES (SAFE FOR RAILWAY)
-───────────────────────────────────────────── */
+/* ───────────── FILE HELPERS ───────────── */
 
 const WHITELIST_FILE = "./whitelist.json";
 const MINTED_FILE = "./minted.json";
 
-const getWhitelist = () => {
-  try {
-    if (!fs.existsSync(WHITELIST_FILE)) return [];
-    return fs.readFileSync(WHITELIST_FILE, "utf8")
-      .split("\n")
-      .map(w => w.trim())
-      .filter(Boolean);
-  } catch (e) {
-    console.error("WHITELIST ERROR:", e);
-    return [];
-  }
+const readList = (file) => {
+  if (!fs.existsSync(file)) return [];
+  const data = fs.readFileSync(file, "utf8");
+  return data
+    .split("\n")
+    .map(x => x.trim())
+    .filter(Boolean);
 };
 
-const getMinted = () => {
-  try {
-    if (!fs.existsSync(MINTED_FILE)) return [];
-    const data = JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
-    return Array.isArray(data) ? data : [];
-  } catch (e) {
-    console.error("MINTED ERROR:", e);
-    return [];
-  }
+const readMinted = () => {
+  if (!fs.existsSync(MINTED_FILE)) return [];
+  return JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
 };
 
 const markMinted = (wallet) => {
-  const minted = getMinted();
+  const minted = readMinted();
   if (!minted.includes(wallet)) {
     minted.push(wallet);
     fs.writeFileSync(MINTED_FILE, JSON.stringify(minted, null, 2));
   }
 };
 
-/* ─────────────────────────────────────────────
-   SOLANA + METAPLEX
-───────────────────────────────────────────── */
+/* ───────────── SOLANA / METAPLEX ───────────── */
 
 const connection = new Connection(RPC_URL, "confirmed");
 
 const metaplex = Metaplex.make(connection)
   .use(keypairIdentity(authority));
 
-/* ─────────────────────────────────────────────
-   EXPRESS + CORS (LOVABLE SAFE)
-───────────────────────────────────────────── */
+/* ───────────── EXPRESS ───────────── */
 
 const app = express();
 
 app.use(cors({
   origin: "*",
   methods: ["POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Accept"]
+  allowedHeaders: ["Content-Type"]
 }));
 
 app.use(express.json());
 
-/* ─────────────────────────────────────────────
-   DRY-RUN CHECK (NO MINT)
-   POST /mint/check
-───────────────────────────────────────────── */
+/* ───────────── DRY-RUN CHECK ───────────── */
 
 app.post("/mint/check", async (req, res) => {
   try {
     const { wallet } = req.body;
-    if (!wallet) {
-      return res.json({ eligible: false, reason: "NO_WALLET" });
-    }
+    if (!wallet) return res.json({ eligible: false });
 
-    const whitelist = getWhitelist();
+    const whitelist = readList(WHITELIST_FILE);
     if (!whitelist.includes(wallet)) {
       return res.json({ eligible: false, reason: "NOT_WHITELISTED" });
     }
 
-    const minted = getMinted();
-    if (minted.includes(wallet)) {
+    if (readMinted().includes(wallet)) {
       return res.json({ eligible: false, reason: "ALREADY_MINTED" });
     }
 
@@ -136,39 +106,27 @@ app.post("/mint/check", async (req, res) => {
       return res.json({ eligible: false, reason: "SOLD_OUT" });
     }
 
-    return res.json({
-      eligible: true,
-      remaining
-    });
+    return res.json({ eligible: true, remaining });
 
   } catch (err) {
     console.error("CHECK ERROR:", err);
-    return res.json({
-      eligible: false,
-      reason: "INTERNAL_ERROR"
-    });
+    return res.json({ eligible: false, reason: "INTERNAL_ERROR" });
   }
 });
 
-/* ─────────────────────────────────────────────
-   LIVE MINT
-   POST /mint
-───────────────────────────────────────────── */
+/* ───────────── LIVE MINT ───────────── */
 
 app.post("/mint", async (req, res) => {
   try {
     const { wallet } = req.body;
-    if (!wallet) {
-      return res.status(400).json({ error: "Wallet required" });
-    }
+    if (!wallet) return res.status(400).json({ error: "Wallet required" });
 
-    const whitelist = getWhitelist();
+    const whitelist = readList(WHITELIST_FILE);
     if (!whitelist.includes(wallet)) {
       return res.status(403).json({ error: "Not whitelisted" });
     }
 
-    const minted = getMinted();
-    if (minted.includes(wallet)) {
+    if (readMinted().includes(wallet)) {
       return res.status(403).json({ error: "Already minted" });
     }
 
@@ -178,17 +136,18 @@ app.post("/mint", async (req, res) => {
       .candyMachines()
       .findByAddress({ address: CANDY_MACHINE_ID });
 
-    const { transaction } = await metaplex
+    // 🔑 THIS IS THE CRITICAL FIX
+    const mintBuilder = await metaplex
       .candyMachines()
+      .builders()
       .mint({
         candyMachine,
         payer: user
       });
 
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = user;
+    const transaction = await mintBuilder.toTransaction(connection);
 
+    transaction.feePayer = user;
     transaction.partialSign(authority);
 
     const serialized = transaction.serialize({
@@ -203,15 +162,11 @@ app.post("/mint", async (req, res) => {
 
   } catch (err) {
     console.error("MINT ERROR:", err);
-    return res.status(500).json({
-      error: err.message || "Mint failed"
-    });
+    return res.status(500).json({ error: err.message });
   }
 });
 
-/* ─────────────────────────────────────────────
-   START SERVER
-───────────────────────────────────────────── */
+/* ───────────── START SERVER ───────────── */
 
 app.listen(PORT, () => {
   console.log(`🚀 Fundoshi backend live on port ${PORT}`);
