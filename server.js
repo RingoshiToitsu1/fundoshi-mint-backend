@@ -5,14 +5,10 @@ import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 
 // ─────────────────────────────────────────────
-// ENV
+// ENV (Railway-safe)
 // ─────────────────────────────────────────────
 
-const PORT = Number(process.env.PORT);
-if (!Number.isInteger(PORT) || PORT < 0 || PORT > 65535) {
-  throw new Error("PORT env var invalid");
-}
-
+const PORT = process.env.PORT || 3000;
 const RPC_URL = process.env.RPC_URL;
 const LIVE_MINT = process.env.LIVE_MINT === "TRUE";
 
@@ -102,10 +98,10 @@ app.post("/mint/check", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// LIVE MINT (LOCKED BY ENV)
+// LIVE MINT (LOCKED)
 // ─────────────────────────────────────────────
 
-app.post("/mint", async (req, res) => {
+app.post("/mint", async (_req, res) => {
   if (!LIVE_MINT) {
     return res.status(403).json({ error: "MINT_DISABLED" });
   }
@@ -113,7 +109,7 @@ app.post("/mint", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// BOOT
+// BOOT (Railway-correct)
 // ─────────────────────────────────────────────
 
 app.listen(PORT, "0.0.0.0", () => {
