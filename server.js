@@ -1,24 +1,31 @@
 import express from "express";
-import cors from "cors";
 import fs from "fs";
+import cors from "cors";
 
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
+import {
+  Connection,
+  Keypair,
+  PublicKey
+} from "@solana/web3.js";
+
+import {
+  Metaplex,
+  keypairIdentity
+} from "@metaplex-foundation/js";
 
 // ─────────────────────────────────────────────
-// CONFIG (ENV SAFE)
+// CONFIG
 // ─────────────────────────────────────────────
 
-const PORT = Number(process.env.PORT || 3000);
-const RPC_URL =
-  process.env.RPC_URL || "https://solana-mainnet.gateway.tatum.io";
+const RPC_URL = "https://solana-mainnet.gateway.tatum.io";
+const PORT = process.env.PORT || 3000;
 
 const CANDY_MACHINE_ID = new PublicKey(
   "3pzu8qm6Hw65VH1khEtoU3ZPi8AtGn92oyjuUvVswArJ"
 );
 
 // ─────────────────────────────────────────────
-// AUTHORITY (NO REDEPLOY REQUIRED)
+// AUTHORITY (FROM ENV — REQUIRED ON RAILWAY)
 // ─────────────────────────────────────────────
 
 if (!process.env.AUTHORITY_SECRET_KEY) {
@@ -36,27 +43,20 @@ const authority = Keypair.fromSecretKey(
 const WHITELIST_FILE = "./whitelist.json";
 const MINTED_FILE = "./minted.json";
 
-if (!fs.existsSync(WHITELIST_FILE)) {
-  fs.writeFileSync(WHITELIST_FILE, "");
-}
-
 if (!fs.existsSync(MINTED_FILE)) {
   fs.writeFileSync(MINTED_FILE, JSON.stringify([]));
 }
 
 const getWhitelist = () =>
-  fs
-    .readFileSync(WHITELIST_FILE, "utf8")
+  fs.readFileSync(WHITELIST_FILE, "utf8")
     .split("\n")
     .map(w => w.trim())
     .filter(Boolean);
 
-const getMinted = () => {
-  const raw = JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
-  return Array.isArray(raw) ? raw : [];
-};
+const getMinted = () =>
+  JSON.parse(fs.readFileSync(MINTED_FILE, "utf8"));
 
-const markMinted = wallet => {
+const markMinted = (wallet) => {
   const minted = getMinted();
   if (!minted.includes(wallet)) {
     minted.push(wallet);
@@ -70,27 +70,31 @@ const markMinted = wallet => {
 
 const connection = new Connection(RPC_URL, "confirmed");
 
-const metaplex = Metaplex.make(connection).use(
-  keypairIdentity(authority)
-);
+const metaplex = Metaplex.make(connection)
+  .use(keypairIdentity(authority));
 
 // ─────────────────────────────────────────────
-// EXPRESS + CORS (LOVABLE SAFE)
+// EXPRESS
 // ─────────────────────────────────────────────
 
 const app = express();
 
-app.use(cors({ origin: "*", methods: ["POST", "OPTIONS"] }));
+app.use(cors({
+  origin: true,
+  methods: ["POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Accept"]
+}));
+
 app.use(express.json());
 
 // ─────────────────────────────────────────────
-// DRY-RUN CHECK (NO MINT)
+// DRY-RUN CHECK
 // ─────────────────────────────────────────────
 
 app.post("/mint/check", async (req, res) => {
   try {
     const { wallet } = req.body;
-    if (!wallet) return res.json({ eligible: false, reason: "NO_WALLET" });
+    if (!wallet) return res.json({ eligible: false });
 
     const whitelist = getWhitelist();
     if (!whitelist.includes(wallet)) {
@@ -114,26 +118,22 @@ app.post("/mint/check", async (req, res) => {
       return res.json({ eligible: false, reason: "SOLD_OUT" });
     }
 
-    return res.json({
-      eligible: true,
-      remaining
-    });
+    return res.json({ eligible: true, remaining });
+
   } catch (err) {
-    console.error("CHECK ERROR:", err);
+    console.error(err);
     return res.json({ eligible: false, reason: "INTERNAL_ERROR" });
   }
 });
 
 // ─────────────────────────────────────────────
-// LIVE MINT (AUTHORITY PARTIAL-SIGNS)
+// LIVE MINT (FIXED)
 // ─────────────────────────────────────────────
 
 app.post("/mint", async (req, res) => {
   try {
     const { wallet } = req.body;
-    if (!wallet) {
-      return res.status(400).json({ error: "Wallet required" });
-    }
+    if (!wallet) return res.status(400).json({ error: "Wallet required" });
 
     const whitelist = getWhitelist();
     if (!whitelist.includes(wallet)) {
@@ -151,15 +151,17 @@ app.post("/mint", async (req, res) => {
       .candyMachines()
       .findByAddress({ address: CANDY_MACHINE_ID });
 
-    const builder = await metaplex
+    const { transaction } = await metaplex
       .candyMachines()
-      .builders()
       .mint({
         candyMachine,
         payer: user
       });
 
-    const transaction = builder.toTransaction(metaplex);
+    // 🔑 REQUIRED FIX
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = user;
 
     transaction.partialSign(authority);
 
@@ -172,11 +174,10 @@ app.post("/mint", async (req, res) => {
     return res.json({
       tx: serialized.toString("base64")
     });
+
   } catch (err) {
     console.error("MINT ERROR:", err);
-    return res.status(500).json({
-      error: err.message || "Mint failed"
-    });
+    return res.status(500).json({ error: err.message });
   }
 });
 
@@ -185,5 +186,5 @@ app.post("/mint", async (req, res) => {
 // ─────────────────────────────────────────────
 
 app.listen(PORT, () => {
-  console.log(`🚀 Fundoshi backend live on port ${PORT}`);
+  console.log(`🚀 Fundoshi mint backend running on port ${PORT}`);
 });
